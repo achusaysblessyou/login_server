@@ -98,7 +98,7 @@ class UsersController < ApplicationController
         format.json{render(:json => {:errCode => :errCode})}
       else
         @userObj.update_attributes({:count => @userObj.count + 1})
-        format.json{render(:json => {:errCode => errCode, :count => (@userObj.count + 1)})}
+        format.json{render(:json => {:errCode => errCode, :count => @userObj.count})}
       end
     end
 
