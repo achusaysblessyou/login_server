@@ -19,11 +19,11 @@ end
 
 gem 'jquery-rails'
 
-group :production do
-	gem 'pg', '0.12.2'
-end
+#group :production do
+#	gem 'pg', '0.12.2'
+#end
 
-group :development do
+group :production do
   gem 'sqlite3', '1.3.5'
 end
 
