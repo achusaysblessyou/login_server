@@ -1,0 +1,13 @@
+        SECURITY WARNING: No secret option provided to Rack::Session::Cookie.
+        This poses a security threat. It is strongly recommended that you
+        provide a secret to prevent exploits that may be possible from crafted
+        cookies. This will not be supported in future versions of Rack, and
+        future versions will even invalidate your existing user cookies.
+
+        Called from: /usr/local/lib/ruby/gems/1.9.1/gems/actionpack-3.2.7/lib/action_dispatch/middleware/session/abstract_store.rb:28:in `initialize'.
+
+[2013-02-11 19:10:49] INFO  WEBrick 1.3.1
+[2013-02-11 19:10:49] INFO  ruby 1.9.2 (2011-07-09) [i686-linux]
+[2013-02-11 19:10:49] INFO  WEBrick::HTTPServer#start: pid=5376 port=3000
+[2013-02-11 19:12:06] INFO  going to shutdown ...
+[2013-02-11 19:12:06] INFO  WEBrick::HTTPServer#start done.

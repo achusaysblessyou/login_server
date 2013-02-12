@@ -1,5 +1,7 @@
 LoginServer::Application.routes.draw do
   resources :users
+  match '/users/add', to: 'users#create'
+  match '/users/login', to: 'users#login'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

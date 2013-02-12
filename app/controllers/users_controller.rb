@@ -37,20 +37,77 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
   end
 
-  # POST /users
-  # POST /users.json
-  def create
-    @user = User.new(params[:user])
+  # DELETE /users/1
+  # DELETE /users/1.json
+  def destroy
+    @user = User.find(params[:id])
+    @user.destroy
 
     respond_to do |format|
-      if @user.save
-        format.html { redirect_to @user, notice: 'User was successfully created.' }
-        format.json { render json: @user, status: :created, location: @user }
+      format.html { redirect_to users_url }
+      format.json { head :no_content }
+    end
+  end
+
+#=begin
+  def create
+    @user = params[:user]
+    @password = params[:password]
+
+    errCode = 1
+
+    if @user.length > 128 and @user.length <= 0
+      errCode = -3
+    end
+    if @password.length > 128
+      errCode = -4
+    end
+
+    @userObj = User.new({:user => @user,:password => @password, :count => 1})
+
+    respond_to do |format|
+      if @userObj.save and errCode == 1
+        format.json{render(:json => {:errCode => 1, :count => 1}) }
       else
-        format.html { render action: "new" }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
+        if errCode < 1
+          format.json{render(:json => {:errCode => errCode}) }
+        else
+          format.json{render(:json => {:errCode => -2})}
+        end
       end
     end
+  end
+#=end
+
+#=begin
+  def login
+    @user = params[:user]
+    @password = params[:password]
+
+    errCode = 1
+    @userObj = User.find_by_user_and_password(@user, @password)
+    if(@userObj == nil)
+      errCode = -1
+    end
+    
+    print "************************* KIRBYU"
+    print @userObj.count
+
+    respond_to do |format|
+      if errCode == -1
+        format.json{render(:json => {:errCode => :errCode})}
+      else
+        @userObj.update_attributes({:count => @userObj.count + 1})
+        format.json{render(:json => {:errCode => errCode, :count => (@userObj.count + 1)})}
+      end
+    end
+
+    print "******************** KIRBY **********************\n"
+    print @user
+    print @password
+    print @userObj
+    print "******************** KIRB ***********************\n"
+
   end
 
   # PUT /users/1
@@ -69,15 +126,28 @@ class UsersController < ApplicationController
     end
   end
 
-  # DELETE /users/1
-  # DELETE /users/1.json
-  def destroy
-    @user = User.find(params[:id])
-    @user.destroy
+#=end
+
+  # POST /users
+  # POST /users.json
+=begin
+  def create
+    @user = User.new(params[:user])
+
+    print "Kirby"
+    print @user
 
     respond_to do |format|
-      format.html { redirect_to users_url }
-      format.json { head :no_content }
+      if @user.save
+        format.html { redirect_to @user, notice: 'User was successfully created.' }
+        format.json { render json: @user, status: :created, location: @user }
+      else
+        format.html { render action: "new" }
+        format.json { render json: @user.errors, status: :unprocessable_entity }
+      end
     end
   end
+=end
+  
+  
 end
