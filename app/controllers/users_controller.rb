@@ -92,7 +92,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if errCode == -1
-        format.json{render(:json => {:errCode => :errCode})}
+        format.json{render(:json => {:errCode => errCode})}
       else
         @userObj.update_attributes({:count => @userObj.count + 1})
         format.json{render(:json => {:errCode => errCode, :count => @userObj.count})}
@@ -120,6 +120,9 @@ class UsersController < ApplicationController
     User.delete_all
     respond_to do |format|
       format.json{render(:json => {:errCode => 1})}
+      print "********************* KIRBY \n"
+      print format.response_for("json")
+      print "********************* Kirby \n"
     end
   end
 
