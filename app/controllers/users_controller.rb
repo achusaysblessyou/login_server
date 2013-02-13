@@ -89,9 +89,6 @@ class UsersController < ApplicationController
     if(@userObj == nil)
       errCode = -1
     end
-    
-    print "************************* KIRBYU"
-    print @userObj.count
 
     respond_to do |format|
       if errCode == -1
@@ -101,13 +98,6 @@ class UsersController < ApplicationController
         format.json{render(:json => {:errCode => errCode, :count => @userObj.count})}
       end
     end
-
-    print "******************** KIRBY **********************\n"
-    print @user
-    print @password
-    print @userObj
-    print "******************** KIRB ***********************\n"
-
   end
 
   # PUT /users/1
@@ -123,6 +113,13 @@ class UsersController < ApplicationController
         format.html { render action: "edit" }
         format.json { render json: @user.errors, status: :unprocessable_entity }
       end
+    end
+  end
+
+  def deleteAllRecords
+    User.delete_all
+    respond_to do |format|
+      format.json{render(:json => {:errCode => 1})}
     end
   end
 

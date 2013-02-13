@@ -2,6 +2,7 @@ LoginServer::Application.routes.draw do
   resources :users
   match '/users/add', to: 'users#create'
   match '/users/login', to: 'users#login'
+  match '/TESTAPI/resetFixture', to: 'users#deleteAllRecords'
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
