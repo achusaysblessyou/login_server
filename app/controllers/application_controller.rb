@@ -9,8 +9,17 @@ class ApplicationController < ActionController::Base
   end
 
   def unitTests
+    %x(rake test:units > out.tmp)
+    file = File.open("out.tmp","r")
+    fileString = ""
+    while(line = file.gets)
+      fileString = fileString + line
+    end
+    file.close
+    totalTests = Integer(fileString[/[0-9]+\stests/][/[0-9]+/])
+    nrFailed = Integer(fileString[/[0-9]+\sfailures/][/[0-9]+/])
     respond_to do |format|
-      format.json{render(:json => {:totalTests => 10, :nrFailed => 0, :output => "this is hardcoded output for testing"})}
+      format.json{render(:json => {:totalTests => totalTests, :nrFailed => nrFailed, :output => fileString})}
     end
   end
 
