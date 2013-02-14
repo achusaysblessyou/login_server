@@ -56,21 +56,20 @@ class UsersController < ApplicationController
 
     errCode = 1
 
-    if @user.length > 128 and @user.length <= 0
+    if @user.length > 128 or @user.length <= 0
       errCode = -3
     end
     if @password.length > 128
       errCode = -4
     end
 
-    @userObj = User.new({:user => @user,:password => @password, :count => 1})
-
     respond_to do |format|
-      if @userObj.save and errCode == 1
-        format.json{render(:json => {:errCode => 1, :count => 1}) }
+      if errCode < 1
+        format.json{render(:json => {:errCode => errCode}) }
       else
-        if errCode < 1
-          format.json{render(:json => {:errCode => errCode}) }
+        @userObj = User.new({:user => @user,:password => @password, :count => 1})
+        if @userObj.save
+          format.json{render(:json => {:errCode => 1, :count => 1}) }
         else
           format.json{render(:json => {:errCode => -2})}
         end
