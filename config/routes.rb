@@ -3,7 +3,7 @@ LoginServer::Application.routes.draw do
   match '/users/add', to: 'users#create', :defaults => {:format => 'json'}
   match '/users/login', to: 'users#login', :defaults => {:format => 'json'}
   match '/TESTAPI/resetFixture', to: 'application#deleteAllRecords', :defaults => {:format => 'json'}
-  match '/TESTAPI/unitTests', to: 'users#unitTests', :defaults => {:format => 'json'}
+  match '/TESTAPI/unitTests', to: 'application#unitTests', :defaults => {:format => 'json'}
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

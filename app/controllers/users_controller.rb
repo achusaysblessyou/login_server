@@ -49,50 +49,61 @@ class UsersController < ApplicationController
     end
   end
 
-#=begin
+  #called by clients.html "add user" button
   def create
+    #grab user and password
     @user = params[:user]
     @password = params[:password]
 
     errCode = 1
 
+    #check length of user & set appropriate errCode
     if @user.length > 128 or @user.length <= 0
       errCode = -3
     end
+    #check length of password & set appropriate errCode
     if @password.length > 128
       errCode = -4
     end
 
     respond_to do |format|
       if errCode < 1
+        #if there's already an error, return just errCode
         format.json{render(:json => {:errCode => errCode}) }
       else
+        #try to create user
         @userObj = User.new({:user => @user,:password => @password, :count => 1})
         if @userObj.save
+          #if I can save user (user doesn't share user), return count = 1 and errCode = 1
           format.json{render(:json => {:errCode => 1, :count => 1}) }
         else
+          #if user has same user with another, return errCode -2 for user already exists
           format.json{render(:json => {:errCode => -2})}
         end
       end
     end
   end
-#=end
 
-#=begin
+  #called by clients.html "Login" button
   def login
+    #grab user and password
     @user = params[:user]
     @password = params[:password]
 
+    #default errCode to 1
     errCode = 1
     @userObj = User.find_by_user_and_password(@user, @password)
+    #try to find user, if doesn't exist, then errCode is -1
     if(@userObj == nil)
       errCode = -1
     end
 
     respond_to do |format|
       if errCode == -1
+        #user doesn't exist, return only errCode
         format.json{render(:json => {:errCode => errCode})}
       else
+        #if user exists, increment count and return errCode 1 and count
         @userObj.update_attributes({:count => @userObj.count + 1})
         format.json{render(:json => {:errCode => errCode, :count => @userObj.count})}
       end
@@ -113,23 +124,6 @@ class UsersController < ApplicationController
         format.json { render json: @user.errors, status: :unprocessable_entity }
       end
     end
-  end
-
-=begin
-  def deleteAllRecords
-    User.delete_all
-    respond_to do |format|
-      format.json{render(:json => {:errCode => 1})}
-    end
-  end
-
-  def unitTests
-    respond_to do |format|
-      format.json{render(:json => {:errCode => 1})}
-    end
-  end
-
-=end
-  
+  end 
   
 end
