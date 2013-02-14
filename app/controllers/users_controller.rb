@@ -120,11 +120,14 @@ class UsersController < ApplicationController
     User.delete_all
     respond_to do |format|
       format.json{render(:json => {:errCode => 1})}
-      print "********************* KIRBY \n"
-      print format.response_for("json")
-      print "********************* Kirby \n"
     end
   end
+
+  #def unitTests
+  #  respond_to do |format|
+  #    format.json{render(:json => {:errCode => 1})}
+  #  end
+  #end
 
 #=end
 
