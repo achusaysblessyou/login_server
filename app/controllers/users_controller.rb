@@ -116,6 +116,7 @@ class UsersController < ApplicationController
     end
   end
 
+=begin
   def deleteAllRecords
     User.delete_all
     respond_to do |format|
@@ -123,33 +124,12 @@ class UsersController < ApplicationController
     end
   end
 
-  #def unitTests
-  #  respond_to do |format|
-  #    format.json{render(:json => {:errCode => 1})}
-  #  end
-  #end
-
-#=end
-
-  # POST /users
-  # POST /users.json
-=begin
-  def create
-    @user = User.new(params[:user])
-
-    print "Kirby"
-    print @user
-
+  def unitTests
     respond_to do |format|
-      if @user.save
-        format.html { redirect_to @user, notice: 'User was successfully created.' }
-        format.json { render json: @user, status: :created, location: @user }
-      else
-        format.html { render action: "new" }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
+      format.json{render(:json => {:errCode => 1})}
     end
   end
+
 =end
   
   
