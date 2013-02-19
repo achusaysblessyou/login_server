@@ -12,30 +12,54 @@
 </head>
 
 <center>
-    <div id="login-box" style="font-family:verdana;padding:20px;width:300px;border-radius:10px;border:10px solid #FFFF00;">
+
+    <!-- This is the Login "box"... displays if you're logged out -->
+    <div id="login-box" style="font-family:verdana;padding:20px;width:350px;height:180px;border-radius:10px;border:10px solid #FFFF00;">
         <div id="login-message" class="message" style = "color:#FFFF00">Hi! Please login below:</div><br>
-        <form style="color:#FFFF00;opacity:0.8;width:300px;height:100px;background-color:#00008B">
+        <form style="color:#FFFF00;opacity:0.8;width:350px;height:140px;background-color:#00008B">
             Username: <input id="username" type="text" name="username">
             <br>
             Password: <input id="password" type="password" name="password">
             <br>
             <br>
-            <input id="login-button" type="submit" value="Login">
+            <input id="login-button" type="submit" value="Login" size:"10">
             <input id="add-user-button" type="submit" value="Add User">
             <input id="reset-server-button" type="submit" value="Reset Server">
+            <input id="run-tests-button" type="submit" value="Run Tests">
         </form>
     </div>
 
-
+    <!-- This is the Logged in "box"... displays after you've logged in -->
     <div id="logged-in-box" class="box" style="font-family:verdana; padding:20px; width:300px; border-radius:10px; border:10px solid #FFFF00; background-color:#00008B">
         <div id="logged-in-message" class="message" style = "color:#FFFF00"></div>
         <br>
         <form style="color:#FFFF00;opacity:0.8;width:300px;height:10px;background- color:#00008B">
             <input id="logout-button" type="submit" value="Logout">
-            <input id="reset-server-button_two" type="submit" value="Reset Server">
+            <input id="reset-server-button-two" type="submit" value="Reset Server">
         </form>
     </div>
 
+    <!-- This is the Server Reset "box"... displays after you've reset the server -->
+    <div id="server-reset-box" class="box" style="font-family:verdana; padding:20px; width:300px; border-radius:10px; border:10px solid #FFFF00; background-color:#00008B">
+        <div id="server-reset-message" class="message" style = "color:#FFFF00"></div>
+        <br>
+        <form style="color:#FFFF00;opacity:0.8;width:300px;height:10px;background- color:#00008B">
+            <input id="go-to-login-button" type="submit" value="Go to Login Screen">
+        </form>
+    </div>
+
+    <!-- This is the Run Tests "box"... displays after you've reset the server -->
+    <div id="run-tests-box" class="box" style="font-family:verdana; padding:20px; width:300px; border-radius:10px; border:10px solid #FFFF00; background-color:#00008B">
+        <div id="number-tests-message" class="message" style = "color:#FFFF00"></div>
+        <div id="number-failed-tests-message" class="message" style = "color:#FFFF00"></div>
+        <div id="run-tests-output-message" class="message" style = "color:#FFFF00"></div>
+        <br>
+        <form style="color:#FFFF00;opacity:0.8;width:300px;height:10px;background- color:#00008B">
+            <input id="go-to-login-button-two" type="submit" value="Go to Login Screen">
+        </form>
+    </div>
+
+    <!-- This is the canvas part where I did a little experimenting -->
     <br>
     <div id="canvas-message" class="message" style = "color:#FFFF00">Hi, this is a HTML canvas object:</div>
     <br>
@@ -43,9 +67,9 @@
     <br>
     <canvas id="myCanvas" width="400" height="400"
     style="border:1px solid #000000; background-color:#FFFFFF; position:relative;"
-    onmousemove="cnvs_getCoordinates(event)" onmouseout="cnvs_clearCoordinates()">
-    </canvas> 
-    <div id="canvas-coord-message" class="message" style = "color:#FFFF00"></div>
+    onmousemove="cnvs_drawLine(event)" onmouseout="cnvs_clearCanvas()">
+</canvas> 
+<div id="canvas-coord-message" class="message" style = "color:#FFFF00"></div>
 </center>
 
 <script type="text/javascript">
@@ -56,15 +80,20 @@ var prevY = -1;
 
 //a "dict" of error code messages
 var errCodeMessage = {};
-errCodeMessage[-1] = 
+errCodeMessage[-1] = "Invalid Username/Password combination. Please try again."
+errCodeMessage[-2] = "Username has already been taken. Please try again."
+errCodeMessage[-3] = "Username must be non-empty and at most 128 characters long. Please try again."
+errCodeMessage[-4] = "Password must be at most 128 characters long. Please try again."
 
 //initial set-up:
 $('#password').val("")
 $('#username').val("")
 $('#logged-in-box').hide()
+$('#server-reset-box').hide()
+$('#run-tests-box').hide()
 $('#login-box').show()
 
-//Event: login-button click
+//Event handler: login-button click
 $('#login-button').click(function() {
     //do an ajax call, success/failure contain callback functions
     $.ajax({
@@ -80,7 +109,7 @@ $('#login-button').click(function() {
     return false;
 });
 
-//Event: add-user-button click
+//Event handler: add-user-button click
 $('#add-user-button').click(function() {
     //do an ajax call, success/failure contain callback functions
     $.ajax({
@@ -95,17 +124,19 @@ $('#add-user-button').click(function() {
     return false;
 });
 
-//Event: logout-button click
+//Event handler: logout-button click
 $('#logout-button').click(function() {
     //no ajax needed to logout
     $('#password').val("")
     $('#username').val("")
     $('#logged-in-box').hide()
+    $('#server-reset-box').hide()
+    $('#run-tests-box').hide()
     $('#login-box').show()
     return false;
 });
 
-//Event: reset-server-button
+//Event handler: reset-server-button
 $('#reset-server-button').click(function() {
     //simply send a post request to /TESTAPI/resetFixture
     $.post('/TESTAPI/resetFixture','', function(data) {
@@ -114,7 +145,8 @@ $('#reset-server-button').click(function() {
     return false;
 });
 
-//Event: reset-server-button-two (this is the one on the logged-in screen)
+//Event handler: reset-server-button-two 
+// this is the one on the logged-in-box
 $('#reset-server-button-two').click(function() {
     //simply send a post request to /TESTAPI/resetFixture
     $.post('/TESTAPI/resetFixture','', function(data) {
@@ -123,46 +155,116 @@ $('#reset-server-button-two').click(function() {
     return false;
 });
 
+//Event handler: run-tests-button
+$('#run-tests-button').click(function() {
+    //simply send a post request to /TESTAPI/resetFixture
+    $.post('/TESTAPI/unitTests','', function(data) {
+        return run_tests_response(data);
+    });
+    
+    /*
+    $.ajax({
+        type:'POST',
+        url: '/TESTAPI/unitTests',
+        data: '',
+        success: function(data) {return run_tests_response(data);},
+        async: false
+    });
+    */
+    return false;
+});
+
+//Event handler: go-to-login-button click
+$('#go-to-login-button').click(function() {
+    //no ajax required, like logout button
+    $('#password').val("")
+    $('#username').val("")
+    $('#logged-in-box').hide()
+    $('#server-reset-box').hide()
+    $('#login-box').show()
+    return false;
+});
+
+//Event handler: go-to-login-button-two click 
+// this is from the run-tests-box
+$('#go-to-login-button-two').click(function() {
+    //no ajax required, like logout button
+    $('#password').val("")
+    $('#username').val("")
+    $('#logged-in-box').hide()
+    $('#run-tests-box').hide()
+    $('#login-box').show()
+    return false;
+});
+
 /*************** function login_response *****************
- * function is callback function for the login button
+ * function is callback function for the login button.
+ * if no error: change message, show logged-in-box and hide login-box
+ * if error: display error message
  */
  function login_response(data, username) {
-    //if no error, show logged-in-box and hide login-box
     if(data.errCode > 0) {
         $('#logged-in-message').html("Welcome back " + username + "!<br> You've logged in " + data.count + " times. <br> Please feel free to play with the canvas below!");
         $('#logged-in-box').show()
         $('#login-box').hide()
     } else {
-        //if error, print message
-        $('#login-box').html("There was an error");
+        //if error, display error message
+        $('#login-message').html(errCodeMessage[data.errCode]);
     }
 }
 
-function add_user_response(data, username) {
+/*************** function add_user_response *****************
+ * function is callback function for the add user button
+ * if no error: change message, show logged-in-box and hide login-box
+ * if error: display error message
+ */
+ function add_user_response(data, username) {
     if(data.errCode > 0) {
         $('#logged-in-message').html("Hi, " + username + "! <br> You've logged in " + data.count + " times. <br> Please feel free to play with the canvas below!");
+        $('#logged-in-box').show()
+        $('#login-box').hide()
     } else {
-        $('#logged-in-message').html("There was an error");
+        $('#login-message').html(errCodeMessage[data.errCode]);
     }
-    $('#logged-in-box').show()
-    $('#login-box').hide()
 }
 
-function reset_response(data) {
-    if(data.errCode > 0) {
-        $('#logged-in-message').html("Success! Server reset!");
-    } else {
-        $('#logged-in-message').html("There was an error");
-    }
-    $('#logged-in-box').show()
-    $('#login-box').hide()
-}
-
-/************* function cnvs_getCoordinates *************
- * This function is called upon mouse-over of the canvas,
- * some code borrowed from w3c
+/*************** function reset_response *****************
+ * function is callback function for the reset server button
+ * if no error: change message, show server reset box, hide others
+ * if error: should never get here... can't error on reset
  */
- function cnvs_getCoordinates(e)
+ function reset_response(data) {
+    if(data.errCode > 0) {
+        $('#server-reset-message').html("Success! Server reset!");
+        $('#server-reset-box').show()
+        $('#login-box').hide()
+        $('#logged-in-box').hide()
+    } else {run_test_response
+        $('#server-reset-message').html("If you are seeing this message... You've got a major issue!");
+        $('#server-reset-box').show()
+        $('#login-box').hide()
+        $('#logged-in-box').hide()   
+    }
+}
+
+/*************** function run_tests_response *****************
+ * function is callback function for the run tests button
+ * just run tests and display # tests, # failed, and output
+ */
+ function run_tests_response(data) {
+    $('#number-tests-message').html("Number of Tests: " + data.totalTests);
+    $('#number-failed-tests-message').html("Number of Failed Tests: " + data.nrFailed);
+    $('#run-tests-output-message').html("Output: " + data.output);
+    $('#run-tests-box').show()
+    $('#login-box').hide()
+}
+
+
+/************* function cnvs_drawLine *************
+ * This function is called while mouse is over canvas, draws a line
+ * following the cursor. Some code borrowed from w3c
+ */
+ function cnvs_drawLine(e)
  {
     var x, y
 
@@ -196,7 +298,11 @@ prevY = y;
     $('#canvas-coord-message').html("x: " + x + " y: " + y);
 }
 
-function cnvs_clearCoordinates(e) {
+/************* function cnvs_clearCanvas *************
+ * This function is called once mouse leaves the canvas and it clears it.
+ * some code borrowed from w3c
+ */
+ function cnvs_clearCanvas(e) {
     prevX = -1;
     prevY = -1;
     var c=document.getElementById("myCanvas");
