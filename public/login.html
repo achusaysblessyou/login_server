@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+    function myFunction()
+    {
+        alert("Hello World!");
+    }
+    </script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+</head>
+
+<center>
+    <div id="login-box" style="font-family:verdana;padding:20px;width:300px;border-radius:10px;border:10px solid #FFFF00;background-color:#00008B">
+        <div id="login-message" class="message" style = "color:#FFFF00">This is the login message</div><br>
+        <form style="color:#FFFF00;opacity:0.8;width:300px;height:100px;background-color:#00008B">
+            Username: <input id="username" type="text" name="username"><br>
+            Password: <input id="password" type="password" name="password"><br>
+            <input id="login_button" type="submit" value="Login">
+            <input id="add_user_button" type="submit" value="Add User"><br>
+            <input id="reset_server_button" type="submit" value="Reset Server">
+        </form>
+    </div>
+
+
+    <div id="welcome-page" class="box">
+        <div id="welcome-message" class="message"></div>
+        <center>
+            <form>
+                <input id="logout_button" type="submit" value="Logout">
+            </form>
+        </center>
+    </div>
+
+    <br><div id="canvas-message" class="message" style = "color:#FFFF00">Hi, this is a canvas object:</div><br>
+    <br><div id="canvas-instruction-message" class="message" style = "color:#FFFF00">Move cursor over to "draw" on canvas and remove cursor to clear canvas</div><br>
+
+    <canvas id="myCanvas" width="300" height="200"
+    style="border:1px solid #000000; background-color:#FFFFFF; position:relative;"
+    onmousemove="cnvs_getCoordinates(event)" onmouseout="cnvs_clearCoordinates()">
+</canvas> 
+<div id="canvas-coord-message" class="message" style = "color:#FFFF00"></div>
+
+</center>
+
+<script type="text/javascript">
+<!--
+var prevX = -1;
+var prevY = -1;
+
+$('#welcome-message').html("You should never see this text");
+$('#welcome-page').hide()
+$('#logout_button').hide()
+
+$('#login_button').click(function() {
+    $.ajax({
+        type: 'POST',
+        url: "/users/login",
+        data: JSON.stringify({ user: $('#username').val(), password: $('#password').val() }),
+        contentType: "application/json",
+        dataType: "json",
+        success: function(data) { return login_response(data, $('#username').val()); },
+        failure: function(err) { alert('error occurred on request'); }
+    });
+
+    return false;
+});
+
+
+$('#add_user_button').click(function() {
+    $.ajax({
+        type: 'POST',
+        url: "/users/add",
+        data: JSON.stringify({ user: $('#username').val(), password: $('#password').val() }),
+        contentType: "application/json",
+        dataType: "json",
+        success: function(data) { return add_user_response(data, $('#username').val()); },
+        failure: function(err) { alert('error occurred on request'); }
+    });
+    return false;
+});
+
+$('#reset_server_button').click(function() {
+    $.post('/TESTAPI/resetFixture','', function(data) {
+        return reset_response(data);
+    });
+
+    return false;
+});
+
+function login_response(data, username) {
+    if(data.errCode > 0) {
+        $('#welcome-message').html("Hi, " + username + " The count is " + data.count);
+    } else {
+        $('#welcome-message').html("There was an error");
+    }
+    $('#welcome-page').show()
+}
+
+function add_user_response(data, username) {
+    if(data.errCode > 0) {
+        $('#welcome-message').html("Hi, " + username + " The count is " + data.count);
+    } else {
+        $('#welcome-message').html("There was an error");
+    }
+    $('#welcome-page').show()
+}
+
+function reset_response(data) {
+    if(data.errCode > 0) {
+        $('#welcome-message').html("Success! Server reset!");
+    } else {
+        $('#welcome-message').html("There was an error");
+    }
+    $('#welcome-page').show()
+}
+
+function cnvs_getCoordinates(e)
+{
+    var x, y
+
+    if(e.offsetX) {
+        x = e.offsetX;
+        y = e.offsetY;
+    }
+    else if(e.layerX) {
+        x = e.layerX;
+        y = e.layerY;
+    }
+
+    if(prevX > -1 && prevY > -1) {
+        var c=document.getElementById("myCanvas");
+        var ctx=c.getContext("2d");
+        ctx.moveTo(prevX,prevY);
+        ctx.lineTo(x,y);
+        ctx.stroke();
+    } else {
+        prevX = x;
+        prevY = y;
+    }
+    prevX = x;
+    prevY = y;
+
+    $('#canvas-coord-message').html("x: " + x + " y: " + y);
+}
+
+function cnvs_clearCoordinates(e) {
+    /*
+    context.clearRect ( x , y , w , h )
+
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+    ctx.fillStyle="#FFFFFF";
+    ctx.fillRect(0,0,c.width,c.height);
+    $('#canvas-coord-message').html("");
+    */
+    prevX = -1;
+    prevY = -1;
+    var c=document.getElementById("myCanvas");
+    c.width = c.width;
+    $('#canvas-coord-message').html("");
+}
+-->
+</script>
+
+<body style="background-color:#00008B">
+</body>
+</html>
