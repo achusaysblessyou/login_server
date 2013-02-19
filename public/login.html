@@ -33,8 +33,8 @@
         </center>
     </div>
 
-    <br><div id="canvas-message" class="message" style = "color:#FFFF00">Hi, this is a canvas object:</div><br>
-    <br><div id="canvas-instruction-message" class="message" style = "color:#FFFF00">Move cursor over to "draw" on canvas and remove cursor to clear canvas</div><br>
+    <br><div id="canvas-message" class="message" style = "color:#FFFF00">Hi, this is a canvas object:</div>
+    <br><div id="canvas-instruction-message" class="message" style = "color:#FFFF00">Move cursor over to "draw" on canvas<br> remove cursor to clear canvas</div><br>
 
     <canvas id="myCanvas" width="300" height="200"
     style="border:1px solid #000000; background-color:#FFFFFF; position:relative;"
@@ -159,6 +159,8 @@ function cnvs_clearCoordinates(e) {
     prevY = -1;
     var c=document.getElementById("myCanvas");
     c.width = c.width;
+    var ctx=c.getContext("2d");
+    ctx.moveTo(0,0);
     $('#canvas-coord-message').html("");
 }
 -->
