@@ -22,7 +22,7 @@
             Password: <input id="password" type="password" name="password">
             <br>
             <br>
-            <input id="login-button" type="submit" value="Login" size:"10">
+            <input id="login-button" type="submit" value="Login">
             <input id="add-user-button" type="submit" value="Add User">
             <input id="reset-server-button" type="submit" value="Reset Server">
             <input id="run-tests-button" type="submit" value="Run Tests">
@@ -157,20 +157,10 @@ $('#reset-server-button-two').click(function() {
 
 //Event handler: run-tests-button
 $('#run-tests-button').click(function() {
-    //simply send a post request to /TESTAPI/resetFixture
+    //simply send a post request to /TESTAPI/unitTests
     $.post('/TESTAPI/unitTests','', function(data) {
         return run_tests_response(data);
     });
-    
-    /*
-    $.ajax({
-        type:'POST',
-        url: '/TESTAPI/unitTests',
-        data: '',
-        success: function(data) {return run_tests_response(data);},
-        async: false
-    });
-    */
     return false;
 });
 
