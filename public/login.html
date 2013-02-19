@@ -12,31 +12,30 @@
 </head>
 
 <center>
-    <div id="login-box" style="font-family:verdana;padding:20px;width:300px;border-radius:10px;border:10px solid #FFFF00;background-color:#00008B">
-        <div id="login-message" class="message" style = "color:#FFFF00">This is the login message</div><br>
+    <div id="login-box" style="font-family:verdana;padding:20px;width:300px;border-radius:10px;border:10px solid #FFFF00;">
+        <div id="login-message" class="message" style = "color:#FFFF00">Hi! Please login below:</div><br>
         <form style="color:#FFFF00;opacity:0.8;width:300px;height:100px;background-color:#00008B">
             Username: <input id="username" type="text" name="username"><br>
-            Password: <input id="password" type="password" name="password"><br>
+            Password: <input id="password" type="password" name="password"><br><br>
             <input id="login_button" type="submit" value="Login">
-            <input id="add_user_button" type="submit" value="Add User"><br>
+            <input id="add_user_button" type="submit" value="Add User">
             <input id="reset_server_button" type="submit" value="Reset Server">
         </form>
     </div>
 
 
-    <div id="welcome-page" class="box">
-        <div id="welcome-message" class="message"></div>
-        <center>
-            <form>
-                <input id="logout_button" type="submit" value="Logout">
-            </form>
-        </center>
+    <div id="logged-in-box" class="box" style="font-family:verdana; padding:20px; width:300px; border-radius:10px; border:10px solid #FFFF00; background-color:#00008B">
+        <div id="logged-in-message" class="message" style = "color:#FFFF00"></div><br>
+        <form style="color:#FFFF00;opacity:0.8;width:300px;height:10px;background- color:#00008B">
+            <input id="logout_button" type="submit" value="Logout">
+            <input id="reset_server_button_two" type="submit" value="Reset Server">
+        </form>
     </div>
 
-    <br><div id="canvas-message" class="message" style = "color:#FFFF00">Hi, this is a canvas object:</div>
-    <br><div id="canvas-instruction-message" class="message" style = "color:#FFFF00">Move cursor over to "draw" on canvas<br> remove cursor to clear canvas</div><br>
+    <br><div id="canvas-message" class="message" style = "color:#FFFF00">Hi, this is a HTML canvas object:</div>
+    <br><div id="canvas-instruction-message" class="message" style = "color:#FFFF00">Move cursor over to "draw" on canvas<br> Remove cursor to clear canvas</div><br>
 
-    <canvas id="myCanvas" width="300" height="200"
+    <canvas id="myCanvas" width="400" height="400"
     style="border:1px solid #000000; background-color:#FFFFFF; position:relative;"
     onmousemove="cnvs_getCoordinates(event)" onmouseout="cnvs_clearCoordinates()">
 </canvas> 
@@ -49,9 +48,10 @@
 var prevX = -1;
 var prevY = -1;
 
-$('#welcome-message').html("You should never see this text");
-$('#welcome-page').hide()
-$('#logout_button').hide()
+$('#password').val("")
+$('#username').val("")
+$('#logged-in-box').hide()
+$('#login-box').show()
 
 $('#login_button').click(function() {
     $.ajax({
@@ -81,39 +81,56 @@ $('#add_user_button').click(function() {
     return false;
 });
 
+$('#logout-button').click(function() {
+    $('#password').val("")
+    $('#username').val("")
+    $('#logged-in-box').hide()
+    $('#login-box').show()
+    return false;
+});
+
 $('#reset_server_button').click(function() {
     $.post('/TESTAPI/resetFixture','', function(data) {
         return reset_response(data);
     });
+    return false;
+});
 
+$('#reset_server_button_two').click(function() {
+    $.post('/TESTAPI/resetFixture','',in  function(data) {
+        return reset_response(data);
+    });
     return false;
 });
 
 function login_response(data, username) {
     if(data.errCode > 0) {
-        $('#welcome-message').html("Hi, " + username + " The count is " + data.count);
+        $('#logged-in-message').html("Welcome back " + username + "!<br> You've logged in " + data.count + " times. <br> Please feel free to play with the canvas below!");
     } else {
-        $('#welcome-message').html("There was an error");
+        $('#logged-in-message').html("There was an error");
     }
-    $('#welcome-page').show()
+    $('#logged-in-box').show()
+    $('#login-box').hide()
 }
 
 function add_user_response(data, username) {
     if(data.errCode > 0) {
-        $('#welcome-message').html("Hi, " + username + " The count is " + data.count);
+        $('#logged-in-message').html("Hi, " + username + "! <br> You've logged in " + data.count + " times. <br> Please feel free to play with the canvas below!");
     } else {
-        $('#welcome-message').html("There was an error");
+        $('#logged-in-message').html("There was an error");
     }
-    $('#welcome-page').show()
+    $('#logged-in-box').show()
+    $('#login-box').hide()
 }
 
 function reset_response(data) {
     if(data.errCode > 0) {
-        $('#welcome-message').html("Success! Server reset!");
+        $('#logged-in-message').html("Success! Server reset!");
     } else {
-        $('#welcome-message').html("There was an error");
+        $('#logged-in-message').html("There was an error");
     }
-    $('#welcome-page').show()
+    $('#logged-in-box').show()
+    $('#login-box').hide()
 }
 
 function cnvs_getCoordinates(e)
@@ -146,15 +163,6 @@ function cnvs_getCoordinates(e)
 }
 
 function cnvs_clearCoordinates(e) {
-    /*
-    context.clearRect ( x , y , w , h )
-
-    var c=document.getElementById("myCanvas");
-    var ctx=c.getContext("2d");
-    ctx.fillStyle="#FFFFFF";
-    ctx.fillRect(0,0,c.width,c.height);
-    $('#canvas-coord-message').html("");
-    */
     prevX = -1;
     prevY = -1;
     var c=document.getElementById("myCanvas");
