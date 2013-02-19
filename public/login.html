@@ -15,45 +15,58 @@
     <div id="login-box" style="font-family:verdana;padding:20px;width:300px;border-radius:10px;border:10px solid #FFFF00;">
         <div id="login-message" class="message" style = "color:#FFFF00">Hi! Please login below:</div><br>
         <form style="color:#FFFF00;opacity:0.8;width:300px;height:100px;background-color:#00008B">
-            Username: <input id="username" type="text" name="username"><br>
-            Password: <input id="password" type="password" name="password"><br><br>
-            <input id="login_button" type="submit" value="Login">
-            <input id="add_user_button" type="submit" value="Add User">
-            <input id="reset_server_button" type="submit" value="Reset Server">
+            Username: <input id="username" type="text" name="username">
+            <br>
+            Password: <input id="password" type="password" name="password">
+            <br>
+            <br>
+            <input id="login-button" type="submit" value="Login">
+            <input id="add-user-button" type="submit" value="Add User">
+            <input id="reset-server-button" type="submit" value="Reset Server">
         </form>
     </div>
 
 
     <div id="logged-in-box" class="box" style="font-family:verdana; padding:20px; width:300px; border-radius:10px; border:10px solid #FFFF00; background-color:#00008B">
-        <div id="logged-in-message" class="message" style = "color:#FFFF00"></div><br>
+        <div id="logged-in-message" class="message" style = "color:#FFFF00"></div>
+        <br>
         <form style="color:#FFFF00;opacity:0.8;width:300px;height:10px;background- color:#00008B">
-            <input id="logout_button" type="submit" value="Logout">
-            <input id="reset_server_button_two" type="submit" value="Reset Server">
+            <input id="logout-button" type="submit" value="Logout">
+            <input id="reset-server-button_two" type="submit" value="Reset Server">
         </form>
     </div>
 
-    <br><div id="canvas-message" class="message" style = "color:#FFFF00">Hi, this is a HTML canvas object:</div>
-    <br><div id="canvas-instruction-message" class="message" style = "color:#FFFF00">Move cursor over to "draw" on canvas<br> Remove cursor to clear canvas</div><br>
-
+    <br>
+    <div id="canvas-message" class="message" style = "color:#FFFF00">Hi, this is a HTML canvas object:</div>
+    <br>
+    <div id="canvas-instruction-message" class="message" style = "color:#FFFF00">Move cursor over to "draw" on canvas<br> Remove cursor to clear canvas</div>
+    <br>
     <canvas id="myCanvas" width="400" height="400"
     style="border:1px solid #000000; background-color:#FFFFFF; position:relative;"
     onmousemove="cnvs_getCoordinates(event)" onmouseout="cnvs_clearCoordinates()">
-</canvas> 
-<div id="canvas-coord-message" class="message" style = "color:#FFFF00"></div>
-
+    </canvas> 
+    <div id="canvas-coord-message" class="message" style = "color:#FFFF00"></div>
 </center>
 
 <script type="text/javascript">
 <!--
+//PrevX and PrevY are for the canvas drawing
 var prevX = -1;
 var prevY = -1;
 
+//a "dict" of error code messages
+var errCodeMessage = {};
+errCodeMessage[-1] = 
+
+//initial set-up:
 $('#password').val("")
 $('#username').val("")
 $('#logged-in-box').hide()
 $('#login-box').show()
 
-$('#login_button').click(function() {
+//Event: login-button click
+$('#login-button').click(function() {
+    //do an ajax call, success/failure contain callback functions
     $.ajax({
         type: 'POST',
         url: "/users/login",
@@ -67,8 +80,9 @@ $('#login_button').click(function() {
     return false;
 });
 
-
-$('#add_user_button').click(function() {
+//Event: add-user-button click
+$('#add-user-button').click(function() {
+    //do an ajax call, success/failure contain callback functions
     $.ajax({
         type: 'POST',
         url: "/users/add",
@@ -81,7 +95,9 @@ $('#add_user_button').click(function() {
     return false;
 });
 
+//Event: logout-button click
 $('#logout-button').click(function() {
+    //no ajax needed to logout
     $('#password').val("")
     $('#username').val("")
     $('#logged-in-box').hide()
@@ -89,28 +105,37 @@ $('#logout-button').click(function() {
     return false;
 });
 
-$('#reset_server_button').click(function() {
+//Event: reset-server-button
+$('#reset-server-button').click(function() {
+    //simply send a post request to /TESTAPI/resetFixture
     $.post('/TESTAPI/resetFixture','', function(data) {
         return reset_response(data);
     });
     return false;
 });
 
-$('#reset_server_button_two').click(function() {
+//Event: reset-server-button-two (this is the one on the logged-in screen)
+$('#reset-server-button-two').click(function() {
+    //simply send a post request to /TESTAPI/resetFixture
     $.post('/TESTAPI/resetFixture','', function(data) {
         return reset_response(data);
     });
     return false;
 });
 
-function login_response(data, username) {
+/*************** function login_response *****************
+ * function is callback function for the login button
+ */
+ function login_response(data, username) {
+    //if no error, show logged-in-box and hide login-box
     if(data.errCode > 0) {
         $('#logged-in-message').html("Welcome back " + username + "!<br> You've logged in " + data.count + " times. <br> Please feel free to play with the canvas below!");
+        $('#logged-in-box').show()
+        $('#login-box').hide()
     } else {
-        $('#logged-in-message').html("There was an error");
+        //if error, print message
+        $('#login-box').html("There was an error");
     }
-    $('#logged-in-box').show()
-    $('#login-box').hide()
 }
 
 function add_user_response(data, username) {
@@ -133,10 +158,16 @@ function reset_response(data) {
     $('#login-box').hide()
 }
 
-function cnvs_getCoordinates(e)
-{
+/************* function cnvs_getCoordinates *************
+ * This function is called upon mouse-over of the canvas,
+ * some code borrowed from w3c
+ */
+ function cnvs_getCoordinates(e)
+ {
     var x, y
 
+    //get the x and y offset in terms of the canvas, two ways
+    // to support multiple browsers (offset doesn't work with firefox)
     if(e.offsetX) {
         x = e.offsetX;
         y = e.offsetY;
@@ -146,19 +177,22 @@ function cnvs_getCoordinates(e)
         y = e.layerY;
     }
 
+    //if it's not first time I'm over canvas,
+    // draw a line between my old coordinates and new ones
+    // this happens for every pixel my mouse moves over in the canvas
     if(prevX > -1 && prevY > -1) {
         var c=document.getElementById("myCanvas");
         var ctx=c.getContext("2d");
         ctx.moveTo(prevX,prevY);
         ctx.lineTo(x,y);
         ctx.stroke();
-    } else {
-        prevX = x;
-        prevY = y;
-    }
-    prevX = x;
-    prevY = y;
+    } 
+    //set prevX and prevY to new coordinates (or if it's first time over canvas,
+    // then set it to the first coordinates)
+prevX = x;
+prevY = y;
 
+    //print out coordinates under the canvas
     $('#canvas-coord-message').html("x: " + x + " y: " + y);
 }
 
