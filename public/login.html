@@ -97,7 +97,7 @@ $('#reset_server_button').click(function() {
 });
 
 $('#reset_server_button_two').click(function() {
-    $.post('/TESTAPI/resetFixture','',in  function(data) {
+    $.post('/TESTAPI/resetFixture','', function(data) {
         return reset_response(data);
     });
     return false;
