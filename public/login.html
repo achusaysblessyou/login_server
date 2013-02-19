@@ -14,7 +14,7 @@
 <center>
 
     <!-- This is the Login "box"... displays if you're logged out -->
-    <div id="login-box" style="font-family:verdana;padding:20px;width:350px;height:180px;border-radius:10px;border:10px solid #FFFF00;">
+    <div id="login-box" style="font-family:verdana;padding:20px;width:350px;height:190px;border-radius:10px;border:10px solid #FFFF00;">
         <div id="login-message" class="message" style = "color:#FFFF00">Hi! Please login below:</div><br>
         <form style="color:#FFFF00;opacity:0.8;width:350px;height:140px;background-color:#00008B">
             Username: <input id="username" type="text" name="username">
@@ -127,12 +127,13 @@ $('#add-user-button').click(function() {
 //Event handler: logout-button click
 $('#logout-button').click(function() {
     //no ajax needed to logout
-    $('#password').val("")
-    $('#username').val("")
-    $('#logged-in-box').hide()
-    $('#server-reset-box').hide()
-    $('#run-tests-box').hide()
-    $('#login-box').show()
+    $('#password').val("");
+    $('#username').val("");
+    $('#login-message').html("Hi! Please login below:");
+    $('#logged-in-box').hide();
+    $('#server-reset-box').hide();
+    $('#run-tests-box').hide();
+    $('#login-box').show();
     return false;
 });
 
@@ -167,11 +168,12 @@ $('#run-tests-button').click(function() {
 //Event handler: go-to-login-button click
 $('#go-to-login-button').click(function() {
     //no ajax required, like logout button
-    $('#password').val("")
-    $('#username').val("")
-    $('#logged-in-box').hide()
-    $('#server-reset-box').hide()
-    $('#login-box').show()
+    $('#password').val("");
+    $('#username').val("");
+    $('#login-message').html("Hi! Please login below:");
+    $('#logged-in-box').hide();
+    $('#server-reset-box').hide();
+    $('#login-box').show();
     return false;
 });
 
@@ -179,11 +181,12 @@ $('#go-to-login-button').click(function() {
 // this is from the run-tests-box
 $('#go-to-login-button-two').click(function() {
     //no ajax required, like logout button
-    $('#password').val("")
-    $('#username').val("")
-    $('#logged-in-box').hide()
-    $('#run-tests-box').hide()
-    $('#login-box').show()
+    $('#password').val("");
+    $('#username').val("");
+    $('#login-message').html("Hi! Please login below:");
+    $('#logged-in-box').hide();
+    $('#run-tests-box').hide();
+    $('#login-box').show();
     return false;
 });
 
@@ -195,8 +198,8 @@ $('#go-to-login-button-two').click(function() {
  function login_response(data, username) {
     if(data.errCode > 0) {
         $('#logged-in-message').html("Welcome back " + username + "!<br> You've logged in " + data.count + " times. <br> Please feel free to play with the canvas below!");
-        $('#logged-in-box').show()
-        $('#login-box').hide()
+        $('#logged-in-box').show();
+        $('#login-box').hide();
     } else {
         //if error, display error message
         $('#login-message').html(errCodeMessage[data.errCode]);
@@ -211,8 +214,8 @@ $('#go-to-login-button-two').click(function() {
  function add_user_response(data, username) {
     if(data.errCode > 0) {
         $('#logged-in-message').html("Hi, " + username + "! <br> You've logged in " + data.count + " times. <br> Please feel free to play with the canvas below!");
-        $('#logged-in-box').show()
-        $('#login-box').hide()
+        $('#logged-in-box').show();
+        $('#login-box').hide();
     } else {
         $('#login-message').html(errCodeMessage[data.errCode]);
     }
@@ -226,14 +229,14 @@ $('#go-to-login-button-two').click(function() {
  function reset_response(data) {
     if(data.errCode > 0) {
         $('#server-reset-message').html("Success! Server reset!");
-        $('#server-reset-box').show()
-        $('#login-box').hide()
-        $('#logged-in-box').hide()
+        $('#server-reset-box').show();
+        $('#login-box').hide();
+        $('#logged-in-box').hide();
     } else {run_test_response
         $('#server-reset-message').html("If you are seeing this message... You've got a major issue!");
-        $('#server-reset-box').show()
-        $('#login-box').hide()
-        $('#logged-in-box').hide()   
+        $('#server-reset-box').show();
+        $('#login-box').hide();
+        $('#logged-in-box').hide(); 
     }
 }
 
@@ -245,8 +248,8 @@ $('#go-to-login-button-two').click(function() {
     $('#number-tests-message').html("Number of Tests: " + data.totalTests);
     $('#number-failed-tests-message').html("Number of Failed Tests: " + data.nrFailed);
     $('#run-tests-output-message').html("Output: " + data.output);
-    $('#run-tests-box').show()
-    $('#login-box').hide()
+    $('#run-tests-box').show();
+    $('#login-box').hide();
 }
 
 
@@ -256,7 +259,7 @@ $('#go-to-login-button-two').click(function() {
  */
  function cnvs_drawLine(e)
  {
-    var x, y
+    var x, y;
 
     //get the x and y offset in terms of the canvas, two ways
     // to support multiple browsers (offset doesn't work with firefox)
@@ -278,11 +281,11 @@ $('#go-to-login-button-two').click(function() {
         ctx.moveTo(prevX,prevY);
         ctx.lineTo(x,y);
         ctx.stroke();
-    } 
+    }
     //set prevX and prevY to new coordinates (or if it's first time over canvas,
     // then set it to the first coordinates)
-prevX = x;
-prevY = y;
+    prevX = x;
+    prevY = y;
 
     //print out coordinates under the canvas
     $('#canvas-coord-message').html("x: " + x + " y: " + y);
