@@ -270,8 +270,9 @@ $('#clear-button').click(function() {
 
  function cnvs_drawLineIfClicked(e) 
  {
-    console.log("here")
-    var canvas = document.getElementById("myCanvas")
+    console.log("here");
+    var canvas = document.getElementById("myCanvas");
+    console.log(canvas.mousedown);
     cnvs_drawLine(e);
  }
 
