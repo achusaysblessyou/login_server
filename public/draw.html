@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+    function myFunction()
+    {
+        alert("Hello World!");
+    }
+    </script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+</head>
+
+<center>
+
+    <!-- This is the Login "box"... displays if you're logged out -->
+    <div id="login-box" style="font-family:verdana;padding:20px;width:350px;height:190px;border-radius:10px;border:10px solid #FFFF00;">
+        <div id="login-message" class="message" style = "color:#FFFF00">Hi! Please login below:</div><br>
+        <form style="color:#FFFF00;opacity:0.8;width:350px;height:140px;background-color:#00008B">
+            Username: <input id="username" type="text" name="username">
+            <br>
+            Password: <input id="password" type="password" name="password">
+            <br>
+            <br>
+            <input id="login-button" type="submit" value="Login">
+            <input id="add-user-button" type="submit" value="Add User">
+            <input id="reset-server-button" type="submit" value="Reset Server">
+            <input id="run-tests-button" type="submit" value="Run Tests">
+        </form>
+    </div>
+
+    <!-- This is the Logged in "box"... displays after you've logged in -->
+    <div id="logged-in-box" class="box" style="font-family:verdana; padding:20px; width:300px; border-radius:10px; border:10px solid #FFFF00; background-color:#00008B">
+        <div id="logged-in-message" class="message" style = "color:#FFFF00"></div>
+        <br>
+        <form style="color:#FFFF00;opacity:0.8;width:300px;height:10px;background- color:#00008B">
+            <input id="logout-button" type="submit" value="Logout">
+            <input id="reset-server-button-two" type="submit" value="Reset Server">
+        </form>
+    </div>
+
+    <!-- This is the Server Reset "box"... displays after you've reset the server -->
+    <div id="server-reset-box" class="box" style="font-family:verdana; padding:20px; width:300px; border-radius:10px; border:10px solid #FFFF00; background-color:#00008B">
+        <div id="server-reset-message" class="message" style = "color:#FFFF00"></div>
+        <br>
+        <form style="color:#FFFF00;opacity:0.8;width:300px;height:10px;background- color:#00008B">
+            <input id="go-to-login-button" type="submit" value="Go to Login Screen">
+        </form>
+    </div>
+
+    <!-- This is the Run Tests "box"... displays after you've reset the server -->
+    <div id="run-tests-box" class="box" style="font-family:verdana; padding:20px; width:300px; border-radius:10px; border:10px solid #FFFF00; background-color:#00008B">
+        <div id="number-tests-message" class="message" style = "color:#FFFF00"></div>
+        <div id="number-failed-tests-message" class="message" style = "color:#FFFF00"></div>
+        <div id="run-tests-output-message" class="message" style = "color:#FFFF00"></div>
+        <br>
+        <form style="color:#FFFF00;opacity:0.8;width:300px;height:10px;background- color:#00008B">
+            <input id="go-to-login-button-two" type="submit" value="Go to Login Screen">
+        </form>
+    </div>
+
+    <!-- This is the canvas part where I did a little experimenting -->
+    <br>
+    <div id="canvas-message" class="message" style = "color:#FFFF00">Hi, this is a HTML canvas object:</div>
+    <br>
+    <div id="canvas-instruction-message" class="message" style = "color:#FFFF00">Move cursor over to "draw" on canvas<br> Remove cursor to clear canvas</div>
+    <br>
+    <canvas id="myCanvas" width="1000" height="700"
+    style="border:1px solid #000000; background-color:#FFFFFF; position:relative;"
+    onmousemove="cnvs_drawLineIfClicked(event)">
+    </canvas> 
+
+    <div id="canvasControl-box">
+        <form>
+            <input id="clear-button" type="submit" value="Clear">
+        </form>
+    </div>
+
+<div id="canvas-coord-message" class="message" style = "color:#FFFF00"></div>
+</center>
+
+<script type="text/javascript">
+<!--
+//PrevX and PrevY are for the canvas drawing
+var prevX = -1;
+var prevY = -1;
+
+//a "dict" of error code messages
+var errCodeMessage = {};
+errCodeMessage[-1] = "Invalid Username/Password combination. Please try again."
+errCodeMessage[-2] = "Username has already been taken. Please try again."
+errCodeMessage[-3] = "Username must be non-empty and at most 128 characters long. Please try again."
+errCodeMessage[-4] = "Password must be at most 128 characters long. Please try again."
+
+//initial set-up:
+$('#password').val("")
+$('#username').val("")
+$('#logged-in-box').hide()
+$('#server-reset-box').hide()
+$('#run-tests-box').hide()
+$('#login-box').hide()
+
+//Event handler: login-button click
+$('#login-button').click(function() {
+    //do an ajax call, success/failure contain callback functions
+    $.ajax({
+        type: 'POST',
+        url: "/users/login",
+        data: JSON.stringify({ user: $('#username').val(), password: $('#password').val() }),
+        contentType: "application/json",
+        dataType: "json",
+        success: function(data) { return login_response(data, $('#username').val()); },
+        failure: function(err) { alert('error occurred on request'); }
+    });
+
+    return false;
+});
+
+//Event handler: add-user-button click
+$('#add-user-button').click(function() {
+    //do an ajax call, success/failure contain callback functions
+    $.ajax({
+        type: 'POST',
+        url: "/users/add",
+        data: JSON.stringify({ user: $('#username').val(), password: $('#password').val() }),
+        contentType: "application/json",
+        dataType: "json",
+        success: function(data) { return add_user_response(data, $('#username').val()); },
+        failure: function(err) { alert('error occurred on request'); }
+    });
+    return false;
+});
+
+//Event handler: logout-button click
+$('#logout-button').click(function() {
+    //no ajax needed to logout
+    $('#password').val("");
+    $('#username').val("");
+    $('#login-message').html("Hi! Please login below:");
+    $('#logged-in-box').hide();
+    $('#server-reset-box').hide();
+    $('#run-tests-box').hide();
+    $('#login-box').show();
+    return false;
+});
+
+//Event handler: reset-server-button
+$('#reset-server-button').click(function() {
+    //simply send a post request to /TESTAPI/resetFixture
+    $.post('/TESTAPI/resetFixture','', function(data) {
+        return reset_response(data);
+    });
+    return false;
+});
+
+//Event handler: reset-server-button-two 
+// this is the one on the logged-in-box
+$('#reset-server-button-two').click(function() {
+    //simply send a post request to /TESTAPI/resetFixture
+    $.post('/TESTAPI/resetFixture','', function(data) {
+        return reset_response(data);
+    });
+    return false;
+});
+
+//Event handler: run-tests-button
+$('#run-tests-button').click(function() {
+    //simply send a post request to /TESTAPI/unitTests
+    $.post('/TESTAPI/unitTests','', function(data) {
+        return run_tests_response(data);
+    });
+    return false;
+});
+
+//Event handler: go-to-login-button click
+$('#go-to-login-button').click(function() {
+    //no ajax required, like logout button
+    $('#password').val("");
+    $('#username').val("");
+    $('#login-message').html("Hi! Please login below:");
+    $('#logged-in-box').hide();
+    $('#server-reset-box').hide();
+    $('#run-tests-box').hide();
+    $('#login-box').show();
+    return false;
+});
+
+//Event handler: go-to-login-button-two click 
+// this is from the run-tests-box
+$('#go-to-login-button-two').click(function() {
+    //no ajax required, like logout button
+    $('#password').val("");
+    $('#username').val("");
+    $('#login-message').html("Hi! Please login below:");
+    $('#logged-in-box').hide();
+    $('#run-tests-box').hide();
+    $('#server-reset-box').hide();
+    $('#login-box').show();
+    return false;
+});
+
+//Event Handle: clear-button click
+$('#clear-button').click(function() {
+    //call cnvs_clearCanvas function
+    cnvs_clearCanvas();
+    return false;
+});
+
+/*************** function login_response *****************
+ * function is callback function for the login button.
+ * if no error: change message, show logged-in-box and hide login-box
+ * if error: display error message
+ */
+ function login_response(data, username) {
+    if(data.errCode > 0) {
+        $('#logged-in-message').html("Welcome back " + username + "!<br> You've logged in " + data.count + " times. <br> Please feel free to play with the canvas below!");
+        $('#logged-in-box').show();
+        $('#login-box').hide();
+    } else {
+        //if error, display error message
+        $('#login-message').html(errCodeMessage[data.errCode]);
+    }
+}
+
+/*************** function add_user_response *****************
+ * function is callback function for the add user button
+ * if no error: change message, show logged-in-box and hide login-box
+ * if error: display error message
+ */
+ function add_user_response(data, username) {
+    if(data.errCode > 0) {
+        $('#logged-in-message').html("Hi, " + username + "! <br> You've logged in " + data.count + " times. <br> Please feel free to play with the canvas below!");
+        $('#logged-in-box').show();
+        $('#login-box').hide();
+    } else {
+        $('#login-message').html(errCodeMessage[data.errCode]);
+    }
+}
+
+/*************** function reset_response *****************
+ * function is callback function for the reset server button
+ * if no error: change message, show server reset box, hide others
+ * if error: should never get here... can't error on reset
+ */
+ function reset_response(data) {
+    if(data.errCode > 0) {
+        $('#server-reset-message').html("Success! Server reset!");
+        $('#server-reset-box').show();
+        $('#login-box').hide();
+        $('#logged-in-box').hide();
+    } else {run_test_response
+        $('#server-reset-message').html("If you are seeing this message... You've got a major issue!");
+        $('#server-reset-box').show();
+        $('#login-box').hide();
+        $('#logged-in-box').hide(); 
+    }
+}
+
+/*************** function run_tests_response *****************
+ * function is callback function for the run tests button
+ * just run tests and display # tests, # failed, and output
+ */
+ function run_tests_response(data) {
+    $('#number-tests-message').html("Number of Tests: " + data.totalTests);
+    $('#number-failed-tests-message').html("Number of Failed Tests: " + data.nrFailed);
+    $('#run-tests-output-message').html("Output: " + data.output);
+    $('#run-tests-box').show();
+    $('#login-box').hide();
+}
+
+ function cnvs_drawLineIfClicked(e) 
+ {
+    var canvas = document.getElementById("myCanvas")
+    cnvs_drawLine(e);
+ }
+
+/************* function cnvs_drawLine *************
+ * This function is called while mouse is over canvas, draws a line
+ * following the cursor. Some code borrowed from w3c
+ */
+ function cnvs_drawLine(e)
+ {
+    console.err("here!");
+    var x, y;
+
+    //get the x and y offset in terms of the canvas, two ways
+    // to support multiple browsers (offset doesn't work with firefox)
+    if(e.offsetX) {
+        x = e.offsetX;
+        y = e.offsetY;
+    }
+    else if(e.layerX) {
+        x = e.layerX;
+        y = e.layerY;
+    }
+
+    //if it's not first time I'm over canvas,
+    // draw a line between my old coordinates and new ones
+    // this happens for every pixel my mouse moves over in the canvas
+    if(prevX > -1 && prevY > -1) {
+        var c=document.getElementById("myCanvas");
+        var ctx=c.getContext("2d");
+        ctx.moveTo(prevX,prevY);
+        ctx.lineTo(x,y);
+        ctx.stroke();
+    }
+    //set prevX and prevY to new coordinates (or if it's first time over canvas,
+    // then set it to the first coordinates)
+    prevX = x;
+    prevY = y;
+
+    //print out coordinates under the canvas
+    $('#canvas-coord-message').html("x: " + x + " y: " + y);
+}
+
+/************* function cnvs_clearCanvas *************
+ * This function is called once mouse leaves the canvas and it clears it.
+ * some code borrowed from w3c
+ */
+ function cnvs_clearCanvas(e) {
+    prevX = -1;
+    prevY = -1;
+    var c=document.getElementById("myCanvas");
+    c.width = c.width;
+    var ctx=c.getContext("2d");
+    ctx.moveTo(0,0);
+    $('#canvas-coord-message').html("");
+}
+-->
+</script>
+
+<body style="background-color:#00008B">
+</body>
+</html>
