@@ -270,6 +270,7 @@ $('#clear-button').click(function() {
 
  function cnvs_drawLineIfClicked(e) 
  {
+    console.log("here")
     var canvas = document.getElementById("myCanvas")
     cnvs_drawLine(e);
  }
@@ -280,7 +281,6 @@ $('#clear-button').click(function() {
  */
  function cnvs_drawLine(e)
  {
-    console.err("here!");
     var x, y;
 
     //get the x and y offset in terms of the canvas, two ways
