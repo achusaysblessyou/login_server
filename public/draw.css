@@ -1,0 +1,28 @@
+#canvas-message{
+color:#000000
+}
+
+#canvas-instruction-message{
+color:#000000
+}
+
+#canvasContainer { 
+position: relative; 
+}
+
+#myCanvas{
+border:1px solid #000000;
+background-color:#FFFFFF;
+}
+
+#drawCanvas { 
+position: absolute; 
+top: 1px; 
+left: 1px; 
+}
+
+#canvas-coord-message{
+color:#000000
+
+}
+
