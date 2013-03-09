@@ -2,7 +2,6 @@ var dispCanvas, dispCtx,
 drawCanvas, drawCtx,
 clrButton,
 mouseDown = false,
-count = 0,
 tools = {},
 tool,
 pencilButton,
@@ -15,6 +14,7 @@ lineThicknessBox,
 colorBox,
 buggyCircle = false,
 buggyCircleButton,
+debug = false,
 currentTool = 'pencil'; //defaults tool to pencil tool
 
 function initialize() {
@@ -23,10 +23,11 @@ function initialize() {
 
     //======================== Pencil ============================
     tools.pencil = function () {
-    	// This is called when you start holding down the mouse button.
+        var tool = this;
+        // This is called when you start holding down the mouse button.
     	// This starts the pencil drawing.
 	    this.mousedown = function (event) {
-	    	drawCtx.beginPath();
+            drawCtx.beginPath();
 	    	drawCtx.moveTo(event.x, event.y)
 	    	mouseDown = true;
 	    };
@@ -36,49 +37,45 @@ function initialize() {
 		this.mousemove = function (event) {
 			if (mouseDown) {
 				drawCtx.lineTo(event.x, event.y);
-				if(count == 0) { 
-           			drawCtx.stroke();
-           			canvasUpdate();
-            		count = 0;
-        		} else count++;
+     			drawCtx.stroke();
+       			canvasUpdate();
 			}
 		};
 
 		// This is called when you release the mouse button.
 	    this.mouseup = function (event) {
 	    	if (mouseDown) {
+                if(event.x < 100) event.x = 0;
+                if(event.y < 100) event.y = 0;
 	    		tool.mousemove(event);
 	    		mouseDown = false;
 	    	}
 	    };
 
-	    dispCanvas.onmouseout = function(event) {
+	    this.mouseout = function(event) {
+            console.log(event.x + ' ' + event.y);
 	    	document.getElementById('canvas-coord-message').innerHTML = "";	
-    		drawCtx.stroke(); //<-- finish drawing when mouse button moved outside the canvas
-    		mouseDown = false;
+    	    tool.mouseup(event);
+            mouseDown = false;
     	};
 
     	this.changeColor = function(color) {
     		drawCtx.strokeStyle = color;
     	}
-
-    	lineThicknessBox.onkeydown = function (event) {
-    		if(event.keyCode == 13) { //only check for enter
-    			drawCtx.lineWidth = parseInt(lineThicknessBox.value);
-    			lineThicknessBox.value = "Line Thickness";
-    			return false; //return false on enter (else canvas cleared)
-    		}
-    		//no return for other key presses, else key press doesn't happen
-    	}
 	};
 
 	//======================== Rectangle ============================
 	tools.rectangle = function () {
+        var tool = this;
 
-	    this.mousedown = function (event) {
-	    	mouseDown = true;
-	    	tool.x0 = event.x;
-	    	tool.y0 = event.y;
+        this.mousedown = function (event) {
+            if(mouseDown) {
+                tool.mouseup(event);
+            } else {
+                mouseDown = true;
+                tool.x0 = event.x;
+                tool.y0 = event.y;
+            }
 	    };
 
 	    this.mousemove = function (event) {
@@ -110,29 +107,21 @@ function initialize() {
     	this.changeColor = function(color) {
     		drawCtx.strokeStyle = color;
     	}
-
-        dispCanvas.onmouseout = function(event) {
-            document.getElementById('canvas-coord-message').innerHTML = ""; 
-            drawCtx.stroke(); //<-- finish drawing when mouse button moved outside the canvas
-        };
-
-    	lineThicknessBox.onkeydown = function (event) {
-    		if(event.keyCode == 13) { //only check for enter
-    			drawCtx.lineWidth = parseInt(lineThicknessBox.value);
-    			lineThicknessBox.value = "Line Thickness";
-    			return false; //return false on enter (else canvas cleared)
-    		}
-    		//no return for other key presses, else key press doesn't happen
-    	}
   	};
 
     //======================== Circle ============================
     tools.circle = function () {
+        var tool = this;
 
         this.mousedown = function (event) {
-            mouseDown = true;
-            tool.x0 = event.x;
-            tool.y0 = event.y;
+            if(mouseDown) {
+                //if user went outside canvas while drawing, let them continue
+                tool.mouseup(event);
+            } else {
+                mouseDown = true;
+                tool.x0 = event.x;
+                tool.y0 = event.y;
+            }
         };
 
         this.mousemove = function (event) {
@@ -164,20 +153,6 @@ function initialize() {
         this.changeColor = function(color) {
             drawCtx.strokeStyle = color;
         }
-
-        dispCanvas.onmouseout = function(event) {
-            document.getElementById('canvas-coord-message').innerHTML = ""; 
-            //drawCtx.stroke(); //<-- finish drawing when mouse button moved outside the canvas
-        };
-
-        lineThicknessBox.onkeydown = function (event) {
-            if(event.keyCode == 13) { //only check for enter
-                drawCtx.lineWidth = parseInt(lineThicknessBox.value);
-                lineThicknessBox.value = "Line Thickness";
-                return false; //return false on enter (else canvas cleared)
-            }
-            //no return for other key presses, else key press doesn't happen
-        }
     };
 
 
@@ -194,6 +169,7 @@ function initialize() {
     rectangleButton = document.getElementById("rectangle-button");
     circleButton = document.getElementById("circle-button");
     buggyCircleButton = document.getElementById("buggy-circle-button");
+    debugButton = document.getElementById("debug-button");
 
 
     //Create the "drawCanvas" - the canvas which we draw on, and then copy
@@ -209,7 +185,8 @@ function initialize() {
     drawCtx.lineCap = "round"; //set line cap to round
     drawCtx.lineJoin = "round"; //set line join to be round (no more jaggies)
 
-
+    drawCanvas.addEventListener('mouseover', handleEvent, false);
+    drawCanvas.addEventListener('mouseout', handleEvent, false);
     drawCanvas.addEventListener('mousedown', handleEvent, false);
     drawCanvas.addEventListener('mousemove', handleEvent, false);
     drawCanvas.addEventListener('mouseup',   handleEvent, false);
@@ -244,7 +221,7 @@ function initialize() {
         if(funcToCall) {//check if it's valid
         	funcToCall(event)
         } else {
-        	console.log("Error: no associated function");
+        	if(debug) console.log(currentTool + " has no associated function " + event.type);
         }
     }
 
@@ -267,6 +244,7 @@ function initialize() {
     };
 
     circleButton.onclick = function() {
+        buggyCircle = false;
         currentTool = "circle";
         tool = new tools[currentTool]();
         return false;
@@ -274,7 +252,9 @@ function initialize() {
 
     buggyCircleButton.onclick = function() {
         //lets you play with the buggy circle
-        buggyCircle = !buggyCircle;
+        buggyCircle = true;
+        currentTool = "circle";
+        tool = new tools[currentTool]();
         return false;
     }
 
@@ -301,5 +281,24 @@ function initialize() {
 		}
 	};
 
+    //this button works the same for circle rectangle and pencil
+    lineThicknessBox.onkeydown = function (event) {
+        if(event.keyCode == 13) { //only check for enter
+            drawCtx.lineWidth = parseInt(lineThicknessBox.value);
+            lineThicknessBox.value = "Line Thickness";
+            return false; //return false on enter (else canvas cleared)
+        }
+        //no return for other key presses, else key press doesn't happen
+    };
+
+    debugButton.onclick = function () {
+        debug = !debug;
+        if(debug) {
+            debugButton.value = "Debug On (look at console)";
+        } else {
+            debugButton.value = "Debug Off";
+        }
+        return false;
+    };
 }
 
