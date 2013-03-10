@@ -333,6 +333,7 @@ function initialize() {
 
     buggyCircleButton.onclick = function() {
         //lets you play with the buggy circle
+        drawCtx.beginPath();
         buggyCircle = true;
         currentTool = "circle";
         tool = new tools[currentTool]();
