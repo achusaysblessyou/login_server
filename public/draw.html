@@ -2,21 +2,22 @@
 <html>
 <head>
 <script type="text/javascript" src="tools.js"></script>
+<script type="text/javascript" src="jscolor/jscolor.js"></script>
 <link rel="stylesheet" type="text/css" href="draw.css"/>
 </head>
 
-
+<center>
 <div id="canvas-message" class="message">
-Hi, this is a HTML canvas object:
+Hi, welcome to CanvUs v.1.0.0
 </div><br>
 
 <div id="canvas-instruction-message" class="message">
-Click the buttons below to try out different things. Type into textbox and press enter to apply(color takes a RGB values in the form #000000 and line thickness is just a number, default is 1)
+Click the buttons below to try out different things. Click on the 
 </div><br>
 
 <div id="canvasContainer">
-	<canvas id="myCanvas" width="1000" height="700">
-	</canvas>
+    <canvas id="myCanvas" width="700" height="700">
+    </canvas>
 </div>
 
 <div id="canvasControl-box">
@@ -28,15 +29,20 @@ Click the buttons below to try out different things. Type into textbox and press
         <input id="black-button" type="submit" value="Black">
         <input id="red-button" type="submit" value="Red">
         <input id="blue-button" type="submit" value="Blue">
-        <input id="color-box" type="text" value="Color: #000000">
+        <br>
+        <!-- Deprecated by Color selector
+            <input id="color-box" type="text" value="Color: #000000"> 
+        -->
+        Color selector: <input id="color-selector" class="color {hash: true}" value="000000">
         <input id="line-thickness-box" type="text" value="Line Thickness">
         <input id="buggy-circle-button" type="submit" value="Buggy Circle">
+        <br>
         <input id="debug-button" type="submit" value="Debug Off">
     </form>
 </div>
 
 <div id="canvas-coord-message" class="message"></div>
-
+</center>
 <script type="text/javascript">
 initialize();
 </script>

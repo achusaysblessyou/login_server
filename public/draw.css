@@ -11,14 +11,24 @@ position: relative;
 }
 
 #myCanvas{
+/*border:1px solid #000000;
+background-color:#FFFFFF;*/
 border:1px solid #000000;
 background-color:#FFFFFF;
+/*position: absolute; 
+top: 0px; 
+left: 0px; */
 }
 
+/* Setting this up in the javascript
 #drawCanvas { 
 position: absolute; 
-top: 1px; 
-left: 1px; 
+top: 0px; 
+}
+*/
+
+#canvasControl-box {
+/*position: relative;*/
 }
 
 #canvas-coord-message{
