@@ -3,6 +3,8 @@
 <head>
 <script type="text/javascript" src="tools.js"></script>
 <script type="text/javascript" src="jscolor/jscolor.js"></script>
+<script type="text/javascript" src="base64.js"></script>
+<script type="text/javascript" src="canvas2Image.js"></script>
 <link rel="stylesheet" type="text/css" href="draw.css"/>
 </head>
 
@@ -39,11 +41,12 @@ Type into Line Thickness and hit enter to select the Line Thickness.
         <input id="line-thickness-box" type="text" value="Line Thickness">
         <input id="buggy-circle-button" type="submit" value="Buggy Circle">
         <br>
+        <input id="download-png-button" type="submit" value="Download as PNG">
         <input id="debug-button" type="submit" value="Debug Off">
     </form>
 </div>
 
-<div id="canvas-coord-message" class="message"></div>
+<div id="canvas-message2" class="message"></div>
 </center>
 <script type="text/javascript">
 initialize();

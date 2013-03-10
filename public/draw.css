@@ -32,7 +32,8 @@ top: 0px;
 }
 
 #canvas-coord-message{
-color:#000000
+color:#000000;
+position:relative;
 
 }
 

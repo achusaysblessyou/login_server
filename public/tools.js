@@ -16,6 +16,7 @@ colorBox,
 colorSelector,
 buggyCircle = false,
 buggyCircleButton,
+dlPngButton,
 debug = false,
 currentTool = 'pencil'; //defaults tool to pencil tool
 
@@ -34,7 +35,6 @@ function initialize() {
         // This is called when you start holding down the mouse button.
         // This starts the pencil drawing.
         this.mousedown = function (event) {
-            drawCtx.beginPath();
             drawCtx.moveTo(event.relx, event.rely)
             mouseDown = true;
         };
@@ -64,7 +64,6 @@ function initialize() {
 
         this.mouseout = function(event) {
             if(debug) console.log("exit coords mouseout: " + event.relx + ' ' + event.rely);
-            document.getElementById('canvas-coord-message').innerHTML = ""; 
             event.relx = prevX;
             event.rely = prevY;
             tool.mouseup(event);
@@ -133,6 +132,7 @@ function initialize() {
                 mouseDown = true;
                 tool.x0 = event.relx;
                 tool.y0 = event.rely;
+                drawCtx.beginPath();
             }
         };
 
@@ -183,6 +183,7 @@ function initialize() {
     circleButton = document.getElementById("circle-button");
     buggyCircleButton = document.getElementById("buggy-circle-button");
     debugButton = document.getElementById("debug-button");
+    dlPngButton = document.getElementById("download-png-button");
 
 
     //Create the "drawCanvas" - the canvas which we draw on, and then copy
@@ -193,7 +194,6 @@ function initialize() {
     drawCanvas.width = dispCanvas.width;
     drawCanvas.height = dispCanvas.height;
     drawCanvas.style.border = "1px solid #FF0000";
-    console.log(drawCanvas.style);
     cnvsContainer.appendChild(drawCanvas);
     drawCtx = drawCanvas.getContext('2d');
     drawCtx.lineCap = "round"; //set line cap to round
@@ -245,8 +245,6 @@ function initialize() {
 
     //set up canvas once
     windowResize();
-    console.log(dispCanvas.style);
-    console.log(drawCanvas.style);
 
     //Activate default tool:
     tool = new tools[currentTool]();
@@ -283,8 +281,10 @@ function initialize() {
             console.log("in here" + event.x + " " + event.y);
             */
 
-            event.relx = event.offsetX //- canvLeft;
-            event.rely = event.offsetY //- canvTop;
+            //was using event.x and event.y, but event.x and event.y works if you don't scroll down
+            // because they refer to where in the visible browser window you clicked.
+            event.relx = event.offsetX;
+            event.rely = event.offsetY;
         }
         else if(browser = "firefox" || browser == "ie") { //For Firefox
             //layer provided by firefox gives us the relative position
@@ -379,6 +379,13 @@ function initialize() {
         }
         //no return for other key presses, else key press doesn't happen
     };
+
+    console.log(dlPngButton);
+    dlPngButton.onclick = function(event) {
+        Canvas2Image.saveAsPNG(dispCanvas);
+        document.getElementById('canvas-message2').innerHTML = "Thanks for download the image, plese rename file to <filename>.png to view"; 
+        return false;
+    }
 
     debugButton.onclick = function () {
         debug = !debug;
