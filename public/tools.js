@@ -208,14 +208,14 @@ function initialize() {
     	//console.log(event.type);
         //get the x and y offset in terms of the canvas, two ways
         // to support multiple browsers (offset doesn't work with firefox)
-        if(event.offsetX) { //for Chrome/Opera
-            event.x = event.offsetX;
-            event.y = event.offsetY;
-        }
-        else if(event.layerX) { //For Firefox
+        //if(event.offsetX) { //for Chrome/Opera
+        //    event.x = event.offsetX;
+        //    event.y = event.offsetY;
+        //}
+        //else if(event.layerX) { //For Firefox
             event.x = event.layerX;
             event.y = event.layerY;
-        }
+        //}
 
         var funcToCall = tool[event.type];
         if(funcToCall) {//check if it's valid
