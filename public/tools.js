@@ -1,4 +1,5 @@
-var dispCanvas, dispCtx, 
+var prevX, prevY,
+dispCanvas, dispCtx, 
 drawCanvas, drawCtx,
 clrButton,
 mouseDown = false,
@@ -44,6 +45,8 @@ function initialize() {
             if (mouseDown) {
                 if(debug) console.log("calling " + currentTool+ ":" + event.type + " with mousedown, drawing at " +event.relx + " " + event.rely);
                 drawCtx.lineTo(event.relx, event.rely);
+                prevX = event.relx;
+                prevY = event.rely;
                 drawCtx.stroke();
                 canvasUpdate();
             }
@@ -52,8 +55,8 @@ function initialize() {
         // This is called when you release the mouse button.
         this.mouseup = function (event) {
             if (mouseDown) {
-                if(event.relx < 100) event.relx = 0;
-                if(event.rely < 100) event.rely = 0;
+                //if(event.relx < 100) event.relx = 0;
+                //if(event.rely < 100) event.rely = 0;
                 tool.mousemove(event);
                 mouseDown = false;
             }
@@ -62,6 +65,8 @@ function initialize() {
         this.mouseout = function(event) {
             if(debug) console.log("exit coords mouseout: " + event.relx + ' ' + event.rely);
             document.getElementById('canvas-coord-message').innerHTML = ""; 
+            event.relx = prevX;
+            event.rely = prevY;
             tool.mouseup(event);
             mouseDown = false;
         };
@@ -187,9 +192,10 @@ function initialize() {
     drawCanvas.id = "drawCanvas";
     drawCanvas.width = dispCanvas.width;
     drawCanvas.height = dispCanvas.height;
+    drawCanvas.style.border = "1px solid #FF0000";
+    console.log(drawCanvas.style);
     cnvsContainer.appendChild(drawCanvas);
     drawCtx = drawCanvas.getContext('2d');
-    drawCanvas.style = "position:absolute;top: 1px; left: 1px;"
     drawCtx.lineCap = "round"; //set line cap to round
     drawCtx.lineJoin = "round"; //set line join to be round (no more jaggies)
 
@@ -212,26 +218,35 @@ function initialize() {
         browser = "unknown browser"
     }
 
-    //set the drawCanvas' position to absolute and top & left to 0
-    // this is because the display canvas has been centered, and to put the 
-    // drawing canvas over it, we need to find the offset from 0,0
-    drawCanvas.style.position = "absolute"
-    drawCanvas.style.top = "0px";
-    drawCanvas.style.left = "0px";
 
-    //find the offset of the display canvas to position the drawing canvas and
-    // in chrome/safari use the offset to offset event.x and event.y to draw right
-    canvLeft = 0, canvTop = 0, temp = dispCanvas;
-    if (temp.offsetParent) {
-        do {
-            canvLeft += temp.offsetLeft;
-            canvTop += temp.offsetTop;
-        } while (temp = temp.offsetParent);
+    //called the first time, and every time the display canvas changes
+    function windowResize() {
+        //set the drawCanvas' position to absolute and top & left to 0
+        // this is because the display canvas has been centered, and to put the 
+        // drawing canvas over it, we need to find the offset from 0,0
+        drawCanvas.style.position = "absolute"
+        drawCanvas.style.top = "0px";
+        drawCanvas.style.left = "0px";
+
+        //find the offset of the display canvas to position the drawing canvas and
+        // in chrome/safari use the offset to offset event.x and event.y to draw right
+        canvLeft = 0, canvTop = 0, temp = dispCanvas;
+        if (temp.offsetParent) {
+            do {
+                canvLeft += temp.offsetLeft;
+                canvTop += temp.offsetTop;
+            } while (temp = temp.offsetParent);
+        }
+     
+        //move canvas to the right by canvLeft pixels
+        //shift if left by 8, because something adds a 8 pixel shift
+        drawCanvas.style.left = canvLeft - 8 + "px";
     }
- 
-    //move canvas to the right by canvLeft pixels
-    drawCanvas.style.left = canvLeft + "px";
 
+    //set up canvas once
+    windowResize();
+    console.log(dispCanvas.style);
+    console.log(drawCanvas.style);
 
     //Activate default tool:
     tool = new tools[currentTool]();
@@ -268,13 +283,11 @@ function initialize() {
             console.log("in here" + event.x + " " + event.y);
             */
 
-            event.relx = event.x - canvLeft;
-            event.rely = event.y - canvTop;
+            event.relx = event.offsetX //- canvLeft;
+            event.rely = event.offsetY //- canvTop;
         }
         else if(browser = "firefox" || browser == "ie") { //For Firefox
             //layer provided by firefox gives us the relative position
-            console.log("drawCanvas left: " + drawCanvas.style.left);
-            console.log("top " + drawCanvas.style.top);
             event.relx = event.layerX;
             event.rely = event.layerY;
         }
@@ -287,6 +300,11 @@ function initialize() {
             if(debug) console.log(currentTool + " has no associated function " + event.type);
         }
     }
+
+    window.onresize = function() {
+        if(debug) console.log("canvas is resizing");
+        windowResize();
+    };
 
     clrButton.onclick = function() { 
         clearCanvas(dispCtx); 
