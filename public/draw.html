@@ -16,7 +16,8 @@ Hi, welcome to CanvUs v.1.0.0
 <div id="canvas-instruction-message" class="message">
 Click the buttons below to select your tool and some preselected colors.<br>
 Click on the Color Selector and select the color to draw with.<br>
-Type into Line Thickness and hit enter to select the Line Thickness.
+Type into Line Thickness and hit enter to select the Line Thickness.<br>
+Sorry, no buggy Rectangle (it's not currently possible)
 </div><br>
 
 <div id="canvasContainer">
@@ -28,6 +29,7 @@ Type into Line Thickness and hit enter to select the Line Thickness.
     <form>
         <input id="clear-button" type="submit" value="Clear">
         <input id="pencil-button" type="submit" value="Pencil">
+        <input id="line-button" type="submit" value="Line">
         <input id="rectangle-button" type="submit" value="Rectangle">
         <input id="circle-button" type="submit" value="Circle">
         <input id="black-button" type="submit" value="Black">
@@ -39,6 +41,7 @@ Type into Line Thickness and hit enter to select the Line Thickness.
         -->
         Color selector: <input id="color-selector" class="color {hash: true}" value="000000">
         <input id="line-thickness-box" type="text" value="Line Thickness">
+        <input id="buggy-line-button" type="submit" value="Buggy Line">
         <input id="buggy-circle-button" type="submit" value="Buggy Circle">
         <br>
         <input id="download-png-button" type="submit" value="Download as PNG">

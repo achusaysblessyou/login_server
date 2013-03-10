@@ -6,6 +6,7 @@ mouseDown = false,
 tools = {},
 tool,
 pencilButton,
+lineButton,
 rectangleButton,
 circleButton,
 blackButton,
@@ -16,6 +17,8 @@ colorBox,
 colorSelector,
 buggyCircle = false,
 buggyCircleButton,
+buggyLine = false,
+buggyLineButton,
 dlPngButton,
 debug = false,
 currentTool = 'pencil'; //defaults tool to pencil tool
@@ -68,6 +71,47 @@ function initialize() {
             event.rely = prevY;
             tool.mouseup(event);
             mouseDown = false;
+        };
+
+        this.changeColor = function(color) {
+            drawCtx.strokeStyle = color;
+        }
+    };
+
+    //======================== Line ============================
+    tools.line = function () {
+        var tool = this;
+        var oldx = 0, oldy = 0;
+
+        this.mousedown = function (event) {
+            if(mouseDown) {
+                tool.mouseup(event);
+            } else {
+                mouseDown = true;
+                tool.x0 = event.relx;
+                tool.y0 = event.rely;
+                drawCtx.beginPath();
+            }
+        };
+
+        this.mousemove = function (event) {
+            if (!mouseDown) {
+                return;
+            }
+
+            if(!buggyLine) drawCtx.beginPath();
+            drawCtx.moveTo(tool.x0, tool.y0);
+            drawCtx.lineTo(event.relx, event.rely);
+            drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+            drawCtx.stroke();
+        };
+
+        this.mouseup = function (event) {
+            if (mouseDown) {
+                tool.mousemove(event);
+                mouseDown = false;
+                canvasUpdate();
+            }
         };
 
         this.changeColor = function(color) {
@@ -179,9 +223,11 @@ function initialize() {
     //colorBox = document.getElementById("color-box"); //<- depricated by colorSelector
     colorSelector = document.getElementById("color-selector");
     pencilButton = document.getElementById("pencil-button")
+    lineButton = document.getElementById("line-button");
     rectangleButton = document.getElementById("rectangle-button");
     circleButton = document.getElementById("circle-button");
     buggyCircleButton = document.getElementById("buggy-circle-button");
+    buggyLineButton = document.getElementById("buggy-line-button");
     debugButton = document.getElementById("debug-button");
     dlPngButton = document.getElementById("download-png-button");
 
@@ -318,6 +364,14 @@ function initialize() {
         return false;
     };
 
+    lineButton.onclick = function() {
+        console.log("here")
+        buggyLine = false;
+        currentTool = "line";
+        tool = new tools[currentTool]();
+        return false;
+    };
+
     rectangleButton.onclick = function() {
         currentTool = "rectangle";
         tool = new tools[currentTool]();
@@ -330,6 +384,15 @@ function initialize() {
         tool = new tools[currentTool]();
         return false;
     };
+
+    buggyLineButton.onclick = function() {
+        //lets you play with the buggy circle
+        drawCtx.beginPath();
+        buggyLine = true;
+        currentTool = "line";
+        tool = new tools[currentTool]();
+        return false;
+    }
 
     buggyCircleButton.onclick = function() {
         //lets you play with the buggy circle
